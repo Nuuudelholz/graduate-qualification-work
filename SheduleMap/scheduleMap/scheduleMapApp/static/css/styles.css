@@ -1,0 +1,431 @@
+@font-face {
+  font-family: 'golos-text_medium';
+  src: url('/static/fonts/golos-text_medium.ttf');
+}
+
+@font-face {
+  font-family: 'golos-text_regular';
+  src: url('/static/fonts/golos-text_regular.ttf');
+}
+
+:root {
+  --purple: #4d19cc;
+  --violet: #cbb8ff;
+  --dark-purple: #2a1468;
+  --gray: #e8e8e8;
+
+}
+
+html, body {
+    height: 100vh;
+    width: auto;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+header {
+    height: 10vh;
+    width: 100%;
+    padding-bottom: 2vh;
+}
+
+.head {
+    height: 100%;
+    width: 100%;
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--purple);
+}
+
+.logo {
+  height: 6vh;
+  width: 6vh;
+  margin-right: 4vh;
+}
+
+.title {
+  font-family: golos-text_medium;
+  font-size: 32px;
+  color: white;
+}
+
+#map {
+  position: absolute;
+  height: 100vh;
+  width: 100%;
+  top: 10vh;
+  z-index: 0;
+}
+
+.leaflet-control-attribution {
+  display: none !important;
+}
+
+.selectedContent {
+  position: absolute;
+  right: 0;
+  pointer-events: none;
+  margin-right: 5vh;
+  z-index: 10;
+}
+
+.selectedBuildingText,
+.selectedWeekText,
+.selectedDayText,
+.selectedFloorText,
+.selectedTimeText {
+  font-family: golos-text_regular;
+  font-size: 24px;
+}
+
+.slctrs-one {
+  position: absolute;
+  display: flex;
+  z-index: 10;
+}
+
+.file-slct {
+  margin-left: 3vh;
+  margin-right: 3vh;
+}
+
+.week-slct, .day-slct {
+  margin-right: 3vh;
+}
+
+.floor-slct {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.selector-txt {
+  font-family: golos-text_medium;
+  font-size: 14px;
+  text-align: center;
+  padding-bottom: 1vh;
+}
+
+.fileSelect, .weekSelect, .daySelect {
+  font-family: golos-text_regular;
+  font-size: 14px;
+  width: 150px;
+  height: 41px;
+  text-align: center;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.floorSelect {
+  display: flex;
+}
+
+.floor_btn {
+  font-family: golos-text_regular;
+  width: 41px;
+  height: 41px;
+  margin-right: 1vh;
+  background-color: var(--purple);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+
+.floor_btn:hover, .time_btn:hover {
+  background-color: var(--dark-purple);
+}
+
+.time-btn {
+  position: absolute;
+  top: 21vh;
+  margin-left: 3vh;
+  display: inline-flex;
+  flex-direction: column;
+  z-index: 10;
+}
+
+.time_btn {
+  width: 150px;
+  height: 41px;
+  margin-bottom: 1vh;
+  background-color: var(--purple);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.analyze-btn {
+  position: absolute;
+  right: 0;
+  bottom: 10vh;
+  margin-right: 3vh;
+  z-index: 10;
+}
+
+.tab-button {
+  padding: 6px 12px;
+  border: none;
+  background-color: white;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.tab-button.active {
+  background-color: var(--gray);
+  color: black;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+.room-type-filter {
+  bottom: 10vh;
+  left: 0;
+  margin-left: 3vh;
+  position: absolute;
+  display: inline-flex;
+  z-index: 10;
+}
+
+.room-type-filter-txt {
+  font-family: golos-text_regular;
+  margin-right: 1vh;
+}
+
+.footer {
+  width: 100%;
+  height: 9vh;
+  background-color: var(--purple);
+  position: absolute;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  gap: 10px;
+}
+
+.contentOpen, .contentClose, .contentPrivate {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: golos-text_regular;
+  font-size: 14px;
+  color: white;
+}
+
+.iconOpen, .iconClose, .iconPrivate {
+  margin-right: 1vh;
+  height: 18px;
+  width: 18px;  
+}
+
+.iconOpen {
+    background-color: #00FF00;
+}
+
+.iconClose {
+    background-color: #FF0000;
+}
+
+.iconPrivate {
+    background-color: var(--dark-purple);
+}
+
+.active-button {
+  background-color: #2a1468;
+  color: white;
+  font-weight: bold;
+  pointer-events: none;
+}
+
+.leaflet-tooltip.room-label {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000;
+    pointer-events: none;
+}
+
+
+/* МОБИЛЬНЫЕ УСТРОЙСТВА */
+@media (max-width: 1131px) {
+  .selectedBuildingText,
+  .selectedWeekText,
+  .selectedDayText,
+  .selectedFloorText,
+  .selectedTimeText {
+    font-family: golos-text_regular;
+    font-size: 18px;
+  }
+
+  .time-btn {
+    left: 0;
+    margin-left: 3vh;
+    top: 23vh;
+  }
+
+  .time_btn {
+    width: 140px;
+    height: 41px;
+    font-family: golos-text_medium;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 1062px) {
+  .selectedBuildingText,
+  .selectedWeekText,
+  .selectedDayText,
+  .selectedFloorText,
+  .selectedTimeText {
+    font-family: golos-text_regular;
+    font-size: 16px;
+  }
+
+  .time-btn {
+    left: 0;
+    margin-left: 3vh;
+    top: 23vh;
+  }
+
+  .time_btn {
+    width: 140px;
+    height: 41px;
+    font-family: golos-text_medium;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 1034px) {
+  .selectedContent {
+    visibility: hidden;
+  }
+
+  .analyze-btn {
+    visibility: hidden;
+  }
+
+  .time-btn {
+    left: 0;
+    margin-left: 3vh;
+    top: 23vh;
+  }
+
+  .time_btn {
+    width: 140px;
+    height: 41px;
+    font-family: golos-text_medium;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 800px) {
+  .fileSelect, .weekSelect, .daySelect {
+    width: 140px;
+    height: 41px;
+    font-size: 14px;
+  }
+
+  .time-btn {
+    left: 0;
+    margin-left: 3vh;
+    top: 23vh;
+  }
+
+  .time_btn {
+    width: 140px;
+    height: 41px;
+    font-family: golos-text_medium;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo {
+    height: 6vh;
+    width: 6vh;
+    margin-right: 4vh;
+  }
+
+  .title {
+    font-family: golos-text_medium;
+    font-size: 16px;
+    color: white;
+  }
+
+  .selectedContent {
+    visibility: hidden;
+  }
+
+  .analyze-btn {
+    visibility: hidden;
+  }
+
+  .slctrs-one {
+    flex-wrap: wrap;
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .fileSelect, .weekSelect, .daySelect {
+    width: 100px;
+    height: 41px;
+    font-size: 10px;
+  }
+
+  .floor-slct {
+    position: absolute;
+    right: 0;
+    top: 10vh;
+  }
+
+  .floorSelect {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .floor_btn {
+    margin-bottom: 1vh;
+  }
+
+  .time-btn {
+    left: 0;
+    margin-left: 1vh;
+    top: 25vh;
+  }
+
+  .time_btn {
+    width: 100px;
+    height: 41px;
+    font-family: golos-text_medium;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 768px) {
+  .fileSelect, .weekSelect, .daySelect {
+    width: 90px;
+    height: 41px;
+    font-size: 10px;
+  }
+}

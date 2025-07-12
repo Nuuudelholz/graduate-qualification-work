@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" href="{% static 'img/head_logo.png' %}" type="image/png">
+    <title>Занятость аудиторий УУНиТ</title>
+    <meta name="csrf-token" content="{{ csrf_token }}">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}" />
+
+    <link rel="stylesheet" href="{% static 'css/charts.css' %}" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="{% static 'js/golos_text_font.js' %}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+
+
+</head>
+<body>
+<header>
+    <div class="head">
+        <img class="logo" src="{% static 'img/logo.png' %}" alt="Логотип">
+        <div class="title">Занятость аудиторий УУНиТ онлайн</div>
+    </div>
+</header>
+
+<main>
+    <div class="selectedContent">
+        <div class="selectedBuildingText" id="selectedBuildingText">Корпус: не выбран</div>
+        <div class="selectedWeekText" id="selectedWeekText">Неделя: не выбрана</div>
+        <div class="selectedDayText" id="selectedDayText">День: не выбран</div>
+        <div class="selectedFloorText" id="selectedFloorText">Этаж: не выбран</div>
+        <div class="selectedTimeText" id="selectedTimeText">Время: не выбрано</div>
+    </div>
+
+    <div class="slctrs-one">
+        <div class="file-slct">
+            <div class="selector-txt">Корпус</div>
+            <select class="fileSelect" id="fileSelect">
+                <option value="">Номер корпуса</option>
+                <option value="1" disabled>1</option>
+                <option value="2" disabled>2</option>
+                <option value="3" disabled>3</option>
+                <option value="4" disabled>4</option>
+                <option value="5" disabled>5</option>
+                <option value="6">6</option>
+                <option value="7" disabled>7</option>
+                <option value="8" disabled>8</option>
+            </select>
+        </div>
+
+        <div class="week-slct">
+            <div class="selector-txt">Номер недели</div>
+            <select class="weekSelect" id="weekSelect">
+                <option value="">Номер недели</option>
+                <script>
+                    for (let i = 1; i <= 42; i++) {
+                               document.write(`<option value="${i}">${i}</option>`);
+                           }
+                </script>
+            </select>
+        </div>
+
+        <div class="day-slct">
+            <div class="selector-txt">День недели</div>
+            <select class="daySelect" id="daySelect">
+                <option value="">День недели</option>
+                <option value="Понедельник">Понедельник</option>
+                <option value="Вторник">Вторник</option>
+                <option value="Среда">Среда</option>
+                <option value="Четверг">Четверг</option>
+                <option value="Пятница">Пятница</option>
+                <option value="Суббота">Суббота</option>
+            </select>
+        </div>
+
+        <div class="floor-slct">
+            <div class="selector-txt">Этаж</div>
+            <div class="floorSelect">
+                <button class="floor_btn" onclick="filterLayer(1); updateFloorText('1'); handleFloorButtonClick(this, 1, '1')">1</button>
+                <button class="floor_btn" onclick="filterLayer(2); updateFloorText('2'); handleFloorButtonClick(this, 2, '2')">2</button>
+                <button class="floor_btn" onclick="filterLayer(3); updateFloorText('3'); handleFloorButtonClick(this, 3, '3')">3</button>
+                <button class="floor_btn" onclick="filterLayer(4); updateFloorText('4'); handleFloorButtonClick(this, 4, '4')">4</button>
+                <button class="floor_btn" onclick="filterLayer(5); updateFloorText('5'); handleFloorButtonClick(this, 5, '5')">5</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="time-btn">
+        <button class="time_btn" onclick="handleTimeButtonClick(this, '08:00-09:20')">08:00-09:20</button>
+        <button class="time_btn" onclick="handleTimeButtonClick(this, '09:35-10:55')">09:35-10:55</button>
+        <button class="time_btn" onclick="handleTimeButtonClick(this, '11:35-12:55')">11:35-12:55</button>
+        <button class="time_btn" onclick="handleTimeButtonClick(this, '13:10-14:30')">13:10-14:30</button>
+        <button class="time_btn" onclick="handleTimeButtonClick(this, '15:10-16:30')">15:10-16:30</button>
+        <button class="time_btn" onclick="handleTimeButtonClick(this, '16:45-18:05')">16:45-18:05</button>
+        <button class="time_btn" onclick="handleTimeButtonClick(this, '18:20-19:40')">18:20-19:40</button>
+    </div>
+
+    <button class="analyze-btn" id="analyze-btn" onclick="">Анализ занятости</button>
+
+    <div class="analysis-section" id="analysis-section">
+        <div class="closeOccupancy" id="closeOccupancy">X</div>
+
+        <label class ="floorFilter" for="floorFilter">Фильтр по этажу:</label>
+        <select id="floorFilter">
+          <option value="">Все этажи</option>
+          <option value="1">1 этаж</option>
+          <option value="2">2 этаж</option>
+          <option value="3">3 этаж</option>
+          <option value="4">4 этаж</option>
+          <option value="5">5 этаж</option>
+        </select>
+
+        <select id="chartTypeSelect">
+          <option value="bar">Столбчатая</option>
+          <option value="pie">Круговая</option>
+          <option value="doughnut">Кольцевая</option>
+        </select>
+
+        <label class="roomSelect" for="roomSelect">Аудитория:</label>
+        <select id="roomSelect">
+          <option value="">Выберите аудиторию</option>
+          {% for room in room_list %}
+            <option value="{{ room }}">{{ room }}</option>
+          {% endfor %}
+        </select>
+
+        <button id="download-pdf">Сохранить график в PDF</button>
+
+        <div id="occupancy-results" class="occupancy-results">
+            {% for item in occupancy_list %}
+                <div class="result-item">{{ item }}</div>
+            {% endfor %}
+        </div>
+        <div class="tabs">
+            <div class="tab-buttons">
+              <button class="tab-button active" data-tab="generalChart">📊 Занятость по аудиториям</button>
+              <button class="tab-button" data-tab="roomChart">📈 Занятость по неделям</button>
+            </div>
+
+            <div id="generalChart" class="tab-panel active">
+              <div id="chart-container" class="chart-container">
+                <canvas id="occupancy-chart"></canvas>
+              </div>
+            </div>
+
+            <div id="roomChart" class="tab-panel">
+              <div id="room-chart-container" class="chart-container">
+                <canvas id="room-schedule-chart"></canvas>
+              </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="roomTypeFilter" class="room-type-filter">
+        <label class="room-type-filter-txt"><input type="checkbox" value="Лекционная">Лекционная</label>
+        <label class="room-type-filter-txt"><input type="checkbox" value="Семинарская">Семинарская</label>
+        <label class="room-type-filter-txt"><input type="checkbox" value="Лаборатория">Лаборатория</label>
+    </div>
+    <div id="map"></div>
+</main>
+
+<footer>
+    <div class="footer">
+        <div class="contentOpen">
+            <div class="iconOpen"> </div>
+            <div class="textOpen">- Свободная аудитория</div>
+        </div>
+        <div class="contentClose">
+            <div class="iconClose"> </div>
+            <div class="textClose">- Занятая аудитория</div>
+        </div>
+        <div class="contentPrivate">
+            <div class="iconPrivate"> </div>
+            <div class="textPrivate">- Неучебное помещение</div>
+        </div>
+    </div>
+</footer>
+<script src="{% static 'js/sideMenu.js' %}"></script>
+<script src="{% static 'js/script.js' %}"></script>
+<script src="{% static 'js/geojson.js' %}"></script>
+<script src="{% static 'js/selectedContentUpdater.js' %}"></script>
+<script src="{% static 'js/occupancy.js' %}"></script>
+<script>
+    const chartData = {{ chart_data|safe }};
+    if (chartData.rooms.length) {
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('occupancy-chart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.rooms,
+                    datasets: [{
+                        label: 'Количество занятий',
+                        data: chartData.counts,
+                        backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>
